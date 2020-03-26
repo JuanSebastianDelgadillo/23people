@@ -133,3 +133,14 @@ $autoload['language'] = array();
 |	$autoload['model'] = array('first_model' => 'first');
 */
 $autoload['model'] = array();
+
+/*
+| -------------------------------------------------------------------
+|  Auto-load Eloquent ORM folder
+| -------------------------------------------------------------------
+ */
+spl_autoload_register(function ($class) {
+    if (file_exists(APPPATH . 'eloquent/' . $class . '.php')) {
+        include APPPATH . 'eloquent/' . $class . '.php';
+    }
+});
