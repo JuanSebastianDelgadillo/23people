@@ -7,9 +7,6 @@ class Restserver extends REST_Controller {
 
 	 public function __construct() {
        parent::__construct();
-       // $this->load->database();
-        // load the library api
-       $this->load->library('pagination');
        // load the model page
        $this->load->model('Restapi_model');
     }
@@ -18,7 +15,7 @@ class Restserver extends REST_Controller {
 	*	Get All data from courses
     **/
 
-	public function courses_get( $perPage = 3  )
+	public function courses_get( $perPage = null  )
 	{
 		$dataPerPage = array();
 		$data = array();
@@ -28,8 +25,9 @@ class Restserver extends REST_Controller {
 			$data['courses'] = $this->Restapi_model->get_courses();
 			
 			
-		}else{
+		}elseif($perPage==null){
 		
+			$perPage = 3;
 			$cantReg = $this->Restapi_model->get_courses_count();
 			$cantPag = ceil($cantReg / $perPage);
 			$dats 	= array();
@@ -46,21 +44,52 @@ class Restserver extends REST_Controller {
 
 			$data['courses'] = $dataPerPage;
 
+		}else{
+
+			$resp = $this->Restapi_model->get_courses_where($perPage);
+
+			if ($resp) {
+				$data['courses'] = $resp;
+			}else{
+				
+				$data['courses'] = $this->show_404();
+
+			}
+
 		}
 
 		$this->response($data);
 		
-		
 	}
 
-	/**
-	*	Get All data from course specific width id
-    **/
-		public function course_get( $id = 0 )
-	{
-		
-		$array = array('no hay', 'datos', 'encontrados', $id);
-		$this->response($array);
+	function courses_post()
+    {
+        // with this function we receive a new course
+        $data = array('returned: '. $this->post('id'));
+        $this->response($data);
+    }
+ 
+    function courses_put()
+    {
+        // with this function we update a course
+        $data = array('returned: '. $this->put('id'));
+        $this->response($data);
+    }
+ 
+    
+ 
+    function courses_delete()
+    {
+         // with this function we delete a course
+        $data = array('returned: '. $this->delete('id'));
+        $this->response($data);
+    }
+
+	public function show_404(){
+		$data = array(
+			'status'=>'404'
+		);
+		return $data;
 	}
 
 
