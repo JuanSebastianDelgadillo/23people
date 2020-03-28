@@ -33,83 +33,100 @@ class Restserver extends REST_Controller {
     }
 
     /**
-	*	Get All data from courses
+	*	I get All data from courses and per page, when It doesn't have a id, this show all Data per page, while it have the word "all", show all data whit format json
     **/
 
 	public function courses_get( $perPage = null  )
 	{
+		//initialize array second
 		$dataPerPage = array();
+		//initialize array main
 		$data = array();
-
+		// I question if the variable have the word all
 		if ( $perPage === 'all') {
-
+			// Show all data
 			$data['courses'] = $this->Restapi_model->get_courses();
 			
 			
 		}elseif($perPage==null){
-		
-			$perPage = 3;
-			$cantReg = $this->Restapi_model->get_courses_count();
-			$cantPag = ceil($cantReg / $perPage);
+			// if not show per page
+			$perPage = 3; //count of register perpage
+			$cantReg = $this->Restapi_model->get_courses_count(); //find the count of register
+			$cantPag = ceil($cantReg / $perPage); //Rounding count pages
 			$dats 	= array();
-			$page 	= 1;
-			$start 	= 0;
+			$page 	= 1; //page initial
+			$start 	= 0; //initial of search
 
 			for ($a=0; $a < $cantPag; $a++) {
-
+				//I make a personalized pagination
 				$dataPerPage['page_'.$page] = $this->Restapi_model->get_courses_limit( $start, $perPage );
 				$start 	= $start+$perPage;
 				$page++;
 
 			}
-
+			//add data at array main
 			$data['courses'] = $dataPerPage;
 
 		}else{
 
+			//find the data of database
 			$resp = $this->Restapi_model->get_courses_where($perPage);
 
 			if ($resp) {
+				//add data at array main I add at courses array
 				$data['courses'] = $resp;
 			}else{
-				
+				// if not show state 404
 				$data['courses'] = $this->show_404();
 
 			}
 
 		}
-
+		// show data main
 		$this->response($data);
 		
 	}
 
+	  /**
+	*	Here I have function post
+    **/
+
 	function courses_post()
     {
     	$data = array();
+    	// decode json data
     	$data = json_decode($this->input->raw_input_stream);
 
+    	// if data is not null
+
     	if (isset($data->code) && isset($data->name)) {
+    		// I make array with data
     		$data = array(
  			'name' => $data->name,
  			'code' => $data->code
 			);
-
+    		// I answer if exist code
     		if ($this->Restapi_model->search_course($data['code'])===1) {
- 			
+ 				// if exist show status 400
  				$res['courses'] = $this->show_400();
 			}else{
+				// 
 	 			if($this->Restapi_model->add_course($data)==1)
 	 			{
+	 				// that's correct, save course
 	 				$res['courses'] = $this->show_201();
 	 			}else{
+	 				// it can`t save course
 	 				$res['courses'] = $this->show_400();
 	 			}
  			}
     		
     	}else{
+    		// if not status 400
     		$res['courses'] = $this->show_400();
     	}
 
+    	// show data
         $this->response($res);
 
     }
@@ -129,14 +146,16 @@ class Restserver extends REST_Controller {
 	 			'code' 	=> $data->code
 				);
 
+    			// if exist the id
 				if($this->Restapi_model->search_course_id($id)==1)
 				{
-
+					// update data
 					if($this->Restapi_model->update_course($id, $data)==1)
-		 			{
+		 			{	
+		 				// that's correct, update course
 		 				$res['courses'] = $this->show_201();
 		 			}else{
-
+		 				// it can`t update
 		 				$res['courses'] = $this->show_400();
 		 			}
 
@@ -165,11 +184,14 @@ class Restserver extends REST_Controller {
     		$data = array();
     		$data = json_decode($this->input->raw_input_stream);
 
+    		// I get id of the course at delete an answer if exists
     		if($this->Restapi_model->delete_course($id)==1)
 			{
+				// that's correct, delete course
 				$res['courses'] = $this->show_200();
 
 			}else{
+				// It can`t delete
 				$res['courses'] = $this->show_404();
 			}
 
