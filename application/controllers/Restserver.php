@@ -64,30 +64,127 @@ class Restserver extends REST_Controller {
 
 	function courses_post()
     {
-        // with this function we receive a new course
-        $data = array('returned: '. $this->post('id'));
-        $this->response($data);
+    	$data = array();
+    	$data = json_decode($this->input->raw_input_stream);
+
+    	if (isset($data->code) && isset($data->name)) {
+    		$data = array(
+ 			'name' => $data->name,
+ 			'code' => $data->code
+			);
+
+    		if ($this->Restapi_model->search_course($data['code'])===1) {
+ 			
+ 				$res['courses'] = $this->show_400();
+			}else{
+	 			if($this->Restapi_model->add_course($data)==1)
+	 			{
+	 				$res['courses'] = $this->show_201();
+	 			}else{
+	 				$res['courses'] = $this->show_400();
+	 			}
+ 			}
+    		
+    	}else{
+    		$res['courses'] = $this->show_400();
+    	}
+
+        $this->response($res);
+
     }
  
-    function courses_put()
+    function courses_put($id = null)
     {
-        // with this function we update a course
-        $data = array('returned: '. $this->put('id'));
-        $this->response($data);
+    	
+    	if ($id !== null) {
+    		$data = array();
+    		$data = json_decode($this->input->raw_input_stream);
+
+    		if (isset($data->name) && isset($data->code))
+    		{
+    			
+    			$data = array(
+	 			'name' 	=> $data->name,
+	 			'code' 	=> $data->code
+				);
+
+				if($this->Restapi_model->search_course_id($id)==1)
+				{
+
+					if($this->Restapi_model->update_course($id, $data)==1)
+		 			{
+		 				$res['courses'] = $this->show_201();
+		 			}else{
+
+		 				$res['courses'] = $this->show_400();
+		 			}
+
+				}else{
+
+		    		$res['courses'] = $this->show_400();
+		    	}
+
+    		}else{
+
+	    		$res['courses'] = $this->show_400();
+	    	}
+
+
+    	}else{
+
+    		$res['courses'] = $this->show_400();
+    	}
+
+       $this->response($res);
     }
  
-    
- 
-    function courses_delete()
+    function courses_delete($id = null)
     {
-         // with this function we delete a course
-        $data = array('returned: '. $this->delete('id'));
-        $this->response($data);
+       if ($id !== null) {
+    		$data = array();
+    		$data = json_decode($this->input->raw_input_stream);
+
+    		if($this->Restapi_model->delete_course($id)==1)
+			{
+				$res['courses'] = $this->show_200();
+
+			}else{
+				$res['courses'] = $this->show_404();
+			}
+
+
+
+    	}else{
+    		$res['courses'] = $this->show_404();
+    	}
+
+    	$this->response($res);
     }
 
 	public function show_404(){
 		$data = array(
 			'status'=>'404'
+		);
+		return $data;
+	}
+
+	public function show_400(){
+		$data = array(
+			'status'=>'400'
+		);
+		return $data;
+	}
+
+	public function show_200(){
+		$data = array(
+			'status'=>'200'
+		);
+		return $data;
+	}
+
+	public function show_201(){
+		$data = array(
+			'status'=>'201'
 		);
 		return $data;
 	}

@@ -3,11 +3,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Restapi_model extends CI_Model {
 
-	 function __construct() { 
-        // Set table name 
-        $this->table = 'course'; 
-    } 
-
 	public function get_courses(){
 		$this->db->select('*');
 		$this->db->from('course');
@@ -37,6 +32,43 @@ class Restapi_model extends CI_Model {
 		$query = $this->db->get();
 		return $query->result();
 	}
+
+	public function add_course($datos){
+		$this->db->insert('course',$datos);
+		return $this->db->affected_rows();
+	}
+
+	public function search_course($code){
+		$this->db->select('*');
+		$this->db->from('course');
+		$this->db->where('code', $code);
+		$query = $this->db->get();
+		return $query->num_rows();
+	}
+
+	public function search_course_id($id){
+		$this->db->select('*');
+		$this->db->from('course');
+		$this->db->where('id', $id);
+		$query = $this->db->get();
+		return $query->num_rows();
+	}
+
+	public function update_course($id, $data){
+		
+		$this->db->where('id', $id);
+		$this->db->update('course', $data);
+		return $this->db->affected_rows();
+	}
+
+	public function delete_course($id){
+		
+		$this->db->where('id', $id);
+		$this->db->delete('course');
+		return $this->db->affected_rows();
+	}
+
+	
 	  
 }
 
