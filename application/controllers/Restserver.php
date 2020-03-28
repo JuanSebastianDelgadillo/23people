@@ -21,7 +21,7 @@ class Restserver extends REST_Controller {
     **/
     public function token_get()
     {
-        $tokenData = 'Hello 23people!';
+        $tokenData = 'CLAVE PARA TOKEN!';
         // Create a token
         $token = AUTHORIZATION::generateToken($tokenData);
         // Set HTTP status code
@@ -98,29 +98,34 @@ class Restserver extends REST_Controller {
     	$data = json_decode($this->input->raw_input_stream);
 
     	// if data is not null
-
     	if (isset($data->code) && isset($data->name)) {
-    		// I make array with data
-    		$data = array(
- 			'name' => $data->name,
- 			'code' => $data->code
-			);
-    		// I answer if exist code
-    		if ($this->Restapi_model->search_course($data['code'])===1) {
- 				// if exist show status 400
- 				$res['courses'] = $this->show_400();
-			}else{
-				// 
-	 			if($this->Restapi_model->add_course($data)==1)
-	 			{
-	 				// that's correct, save course
-	 				$res['courses'] = $this->show_201();
-	 			}else{
-	 				// it can`t save course
+
+    		// valid string
+    		if ($this->valid_code($data->code) && $this->valid_name($data->name)) {
+    				// I make array with data
+	    		$data = array(
+	 			'name' => $data->name,
+	 			'code' => $data->code
+				);
+	    		// I answer if exist code
+	    		if ($this->Restapi_model->search_course($data['code'])===1) {
+	 				// if exist show status 400
 	 				$res['courses'] = $this->show_400();
+				}else{
+					// 
+		 			if($this->Restapi_model->add_course($data)==1)
+		 			{
+		 				// that's correct, save course
+		 				$res['courses'] = $this->show_201();
+		 			}else{
+		 				// it can`t save course
+		 				$res['courses'] = $this->show_400();
+		 			}
 	 			}
- 			}
-    		
+    		}else{
+    			$res['courses'] = $this->show_400();
+    		}
+
     	}else{
     		// if not status 400
     		$res['courses'] = $this->show_400();
@@ -141,35 +146,39 @@ class Restserver extends REST_Controller {
     		if (isset($data->name) && isset($data->code))
     		{
     			
-    			$data = array(
-	 			'name' 	=> $data->name,
-	 			'code' 	=> $data->code
-				);
+    			if ($this->valid_code($data->code) && $this->valid_name($data->name)) 
+    			{
+    					$data = array(
+			 			'name' 	=> $data->name,
+			 			'code' 	=> $data->code
+						);
 
-    			// if exist the id
-				if($this->Restapi_model->search_course_id($id)==1)
-				{
-					// update data
-					if($this->Restapi_model->update_course($id, $data)==1)
-		 			{	
-		 				// that's correct, update course
-		 				$res['courses'] = $this->show_201();
-		 			}else{
-		 				// it can`t update
-		 				$res['courses'] = $this->show_400();
-		 			}
+		    			// if exist the id
+						if($this->Restapi_model->search_course_id($id)==1)
+						{
+							// update data
+							if($this->Restapi_model->update_course($id, $data)==1)
+				 			{	
+				 				// that's correct, update course
+				 				$res['courses'] = $this->show_201();
+				 			}else{
+				 				// it can`t update
+				 				$res['courses'] = $this->show_400();
+				 			}
 
-				}else{
+						}else{
 
-		    		$res['courses'] = $this->show_400();
-		    	}
+				    		$res['courses'] = $this->show_400();
+				    	}
 
-    		}else{
+		    		}else{
 
-	    		$res['courses'] = $this->show_400();
-	    	}
-
-
+			    		$res['courses'] = $this->show_400();
+			    	}
+    			}else{
+    				$res['courses'] = $this->show_400();
+    			}
+    		
     	}else{
 
     		$res['courses'] = $this->show_400();
@@ -181,19 +190,25 @@ class Restserver extends REST_Controller {
     function courses_delete($id = null)
     {
        if ($id !== null) {
-    		$data = array();
-    		$data = json_decode($this->input->raw_input_stream);
-
-    		// I get id of the course at delete an answer if exists
-    		if($this->Restapi_model->delete_course($id)==1)
+    		if($this->Restapi_model->search_course_id($id)==1)
 			{
-				// that's correct, delete course
-				$res['courses'] = $this->show_200();
+				// I get id of the course at delete an answer if exists
+	    		if($this->Restapi_model->delete_course($id)==1)
+				{
+					// that's correct, delete course
+					$res['courses'] = $this->show_200();
+
+				}else{
+					// It can`t delete
+					$res['courses'] = $this->show_404();
+				}
 
 			}else{
-				// It can`t delete
+
 				$res['courses'] = $this->show_404();
+
 			}
+    		
 
     	}else{
     		$res['courses'] = $this->show_404();
@@ -228,6 +243,34 @@ class Restserver extends REST_Controller {
 			'status'=>'201'
 		);
 		return $data;
+	}
+
+	public function valid_code($code){
+
+		$state = false;
+
+		$code = intval($code);
+		//valid if It is number and count is mayor 0 and minor 4
+
+
+		if (is_numeric($code)){
+			
+			$state = true;
+			
+		}
+
+		return $state;
+
+	}
+
+	public function valid_name($name){
+		//valid if It is string and have mayor 4 characters 
+		$state = false;
+		if (is_string($name)) {
+			
+			$state = true;
+		}
+		return $state;
 	}
 
 
