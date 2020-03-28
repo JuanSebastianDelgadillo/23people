@@ -28,7 +28,7 @@ class Restapi_model extends CI_Model {
 	public function get_courses_where($val){
 		$this->db->select('*');
 		$this->db->from('course');
-		$this->db->where('code',$val);
+		$this->db->where('id',$val);
 		$query = $this->db->get();
 		return $query->result();
 	}
