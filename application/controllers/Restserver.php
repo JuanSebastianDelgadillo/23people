@@ -245,20 +245,17 @@ class Restserver extends REST_Controller {
 		return $data;
 	}
 
+	// ALTER TABLE `course` CHANGE `code` `code` SMALLINT(4) NOT NULL;
+
 	public function valid_code($code){
 
 		$state = false;
-
-		$code = intval($code);
 		//valid if It is number and count is mayor 0 and minor 4
-
-
-		if (is_numeric($code)){
-			
-			$state = true;
-			
+		if (strlen($code)===4) {
+			if (is_numeric($code)) {
+				$state = true;
+			}	
 		}
-
 		return $state;
 
 	}
@@ -266,11 +263,16 @@ class Restserver extends REST_Controller {
 	public function valid_name($name){
 		//valid if It is string and have mayor 4 characters 
 		$state = false;
-		if (is_string($name)) {
-			
-			$state = true;
+		if (strlen($name)>0)
+		{
+			if (is_string($name)) {
+				$state = true;
+			}
+		
 		}
+
 		return $state;
+		
 	}
 
 
