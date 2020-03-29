@@ -87,8 +87,8 @@ class Restserver extends REST_Controller {
 		
 	}
 
-	  /**
-	*	Here I have function post
+	/**
+	*	Here I have function post to insert new course
     **/
 
 	function courses_post()
@@ -135,7 +135,11 @@ class Restserver extends REST_Controller {
         $this->response($res);
 
     }
- 
+ 	
+ 	/**
+	*	Here I have function put to update course
+    **/
+
     function courses_put($id = null)
     {
     	
@@ -186,6 +190,10 @@ class Restserver extends REST_Controller {
 
        $this->response($res);
     }
+
+    /**
+	*	Here I have function post to delete course
+    **/
  
     function courses_delete($id = null)
     {
@@ -244,8 +252,6 @@ class Restserver extends REST_Controller {
 		);
 		return $data;
 	}
-
-	// ALTER TABLE `course` CHANGE `code` `code` SMALLINT(4) NOT NULL;
 
 	public function valid_code($code){
 
